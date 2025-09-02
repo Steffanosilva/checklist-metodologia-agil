@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checklist de Boas Práticas Ágeis</title>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='%2310B981' d='M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z'/></svg>">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --cor-primaria: #4A90E2;
+            --cor-secundaria: #F0F4F8;
+            --cor-texto: #333333;
+            --cor-concluido: #9CA3AF;
+            --cor-concluido-verde: #10B981;
+            --sombra-card: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--cor-secundaria);
+            color: var(--cor-texto);
+            line-height: 1.6;
+        }
+
+        .header {
+            background-color: #ffffff;
+            color: var(--cor-primaria);
+            padding: 1.5rem 1rem;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        main {
+            padding: 1rem;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .progress-bar-container {
+            background-color: #E5E7EB;
+            border-radius: 999px;
+            height: 1rem;
+            margin-bottom: 2rem;
+            overflow: hidden;
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .progress-bar {
+            background-color: var(--cor-primaria);
+            height: 100%;
+            width: 0%;
+            transition: width 0.3s ease-in-out;
+            border-radius: 999px;
+        }
+
+        .progress-text {
+            text-align: center;
+            margin-top: 0.5rem;
+            font-size: 0.875rem;
+            color: var(--cor-texto);
+            font-weight: 500;
+        }
+
+        .checklist-card {
+            background-color: #ffffff;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--sombra-card);
+        }
+
+        .checklist-card h2 {
+            font-weight: 700;
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            color: var(--cor-primaria);
+        }
+
+        .checklist-item {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 1.25rem;
+            cursor: pointer;
+            transition: background-color 0.2s ease-in-out;
+        }
+
+        .checklist-item:hover {
+            background-color: #F9FAFB;
+        }
+
+        .checklist-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .checkbox-container {
+            display: inline-block;
+            position: relative;
+            width: 1.5rem;
+            height: 1.5rem;
+            margin-right: 1rem;
+        }
+
+        .checklist-item input[type="checkbox"] {
+            opacity: 0;
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+
+        .checkmark {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 1.5rem;
+            width: 1.5rem;
+            background-color: #E5E7EB;
+            border-radius: 6px;
+            transition: background-color 0.2s ease;
+        }
+
+        .checklist-item input:checked ~ .checkmark {
+            background-color: var(--cor-primaria);
+        }
+
+        .checkmark:after {
+            content: "";
+            position: absolute;
+            display: none;
+        }
+
+        .checklist-item input:checked ~ .checkmark:after {
+            display: block;
+        }
+
+        .checklist-item .checkmark:after {
+            left: 0.5rem;
+            top: 0.25rem;
+            width: 0.3rem;
+            height: 0.75rem;
+            border: solid white;
+            border-width: 0 3px 3px 0;
+            transform: rotate(45deg);
+        }
+
+        .checklist-item-text {
+            flex-grow: 1;
+            transition: color 0.3s ease, text-decoration 0.3s ease;
+        }
+
+        .checklist-item.checked .checklist-item-text {
+            color: var(--cor-concluido);
+            text-decoration: line-through;
+        }
+
+        .section-feedback {
+            text-align: center;
+            font-weight: 700;
+            color: var(--cor-concluido-verde);
+            margin-top: 1rem;
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out;
+        }
+
+        .section-feedback.show {
+            opacity: 1;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 1rem;
+            color: #6B7280;
+            font-size: 0.875rem;
+            margin-top: 2rem;
+        }
+
+        /* Animações */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .checklist-item, .checklist-card {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        @media (max-width: 600px) {
+            .header h1 {
+                font-size: 1.5rem;
+            }
+            main {
+                padding: 0.5rem;
+            }
+            .checklist-card {
+                padding: 1rem;
+            }
+            .checklist-card h2 {
+                font-size: 1.25rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <h1>Checklist de Boas Práticas Ágeis</h1>
+    </header>
+
+    <main>
+        <div class="progress-bar-container">
+            <div class="progress-bar" id="progressBar"></div>
+        </div>
+        <div class="progress-text" id="progressText">0 de 14 concluídos (0%)</div>
+
+        <section id="principios-ageis" class="checklist-card">
+            <h2>Princípios Ágeis</h2>
+            <div class="checklist-item" data-id="p1">
+                <label class="checkbox-container">
+                    <input type="checkbox">
+                    <span class="checkmark"></span>
+                </label>
+                <span class="checklist-item-text">Indivíduos e interações mais que processos e ferramentas.</span>
+            </div>
+            <div class="checklist-item" data-id="p2">
+                <label class="checkbox-container">
+                    <input type="checkbox">
+                    <span class="checkmark"></span>
+                </label>
+                <span class="checklist-item-text">Software em funcionamento mais que documentação abrangente.</span>
+            </div>
+            <div class="checklist-item" data-id="p3">
+                <label class="checkbox-container">
+                    <input type="checkbox">
+                    <span class="checkmark"></span>
+                </label>
+                <span class="checklist-item-text">Colaboração com o cliente mais que negociação de contratos.</span>
+            </div>
+            <div class="checklist-item" data-id="p4">
+                <label class="checkbox-container">
+                    <input type="checkbox">
+                    <span class="checkmark"></span>
+                </label>
+                <span class="checklist-item-text">Responder a mudanças mais que seguir um plano.</span>
+            </div>
+            <div class="section-feedback" id="feedback-principios-ageis">✅ Seção concluída!</div>
+        </section>
+
+        <section id="erros-comuns" class="checklist-card">
+            <h2>Erros Comuns na Migração para Ágil</h2>
+            <div class="checklist-item" data-id="e1">
+                <label class="checkbox-container">
+                    <input type="checkbox">
+                    <span class="checkmark"></span>
+                </label>
+                <span class="checklist-item-text">Focar em ferramentas, não na mentalidade.</span>
+            </div>
+            <div class="checklist-item" data-id="e2">
+                <label class="checkbox-container">
+                    <input type="checkbox">
+                    <span class="checkmark"></span>
+                </label>
+                <span class="checklist-item-text">Falta de treinamento e capacitação.</span>
+            </div>
+            <div class="checklist-item" data-id="e3">
+                <label class="checkbox-container">
+                    <input type="checkbox">
+                    <span class="checkmark"></span>
+                </label>
+                <span class="checklist-item-text">Ignorar a resistência à mudança.</span>
+            </div>
+            <div class="checklist-item" data-id="e4">
+                <label class="checkbox-container">
+                    <input type="checkbox">
+                    <span class="checkmark"></span>
+                </label>
+                <span class="checklist-item-text">Não ter o apoio da liderança.</span>
+            </div>
+            <div class="section-feedback" id="feedback-erros-comuns">✅ Seção concluída!</div>
+        </section>
+
+        <section id="passo-a-passo-mvp" class="checklist-card">
+            <h2>Passo a Passo para Criar um MVP</h2>
+            <div class="checklist-item" data-id="mvp1">
+                <label class="checkbox-container">
+                    <input type="checkbox">
+                    <span class="checkmark"></span>
+                </label>
+                <span class="checklist-item-text">Definir a persona e o problema a ser resolvido.</span>
+            </div>
+            <div class="checklist-item" data-id="mvp2">
+                <label class="checkbox-container">
+                    <input type="checkbox">
+                    <span class="checkmark"></span>
+                </label>
+                <span class="checklist-item-text">Mapear a jornada do usuário.</span>
+            </div>
+            <div class="checklist-item" data-id="mvp3">
+                <label class="checkbox-container">
+                    <input type="checkbox">
+                    <span class="checkmark"></span>
+                </label>
+                <span class="checklist-item-text">Priorizar as funcionalidades essenciais.</span>
+            </div>
+            <div class="checklist-item" data-id="mvp4">
+                <label class="checkbox-container">
+                    <input type="checkbox">
+                    <span class="checkmark"></span>
+                </label>
+                <span class="checklist-item-text">Criar o protótipo e testar com usuários.</span>
+            </div>
+            <div class="checklist-item" data-id="mvp5">
+                <label class="checkbox-container">
+                    <input type="checkbox">
+                    <span class="checkmark"></span>
+                </label>
+                <span class="checklist-item-text">Construir e lançar a primeira versão.</span>
+            </div>
+            <div class="section-feedback" id="feedback-passo-a-passo-mvp">✅ Seção concluída!</div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        Desenvolvido como atividade de extensão - Métodos Ágeis - Stéffano Ferreira
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Referências dos elementos do DOM
+            const allChecklistItems = document.querySelectorAll('.checklist-item');
+            const progressBar = document.getElementById('progressBar');
+            const progressText = document.getElementById('progressText');
+
+            // Mapeia cada seção para seus respectivos IDs e feedback
+            const sections = {
+                'principios-ageis': {
+                    items: document.querySelectorAll('#principios-ageis .checklist-item'),
+                    feedback: document.getElementById('feedback-principios-ageis')
+                },
+                'erros-comuns': {
+                    items: document.querySelectorAll('#erros-comuns .checklist-item'),
+                    feedback: document.getElementById('feedback-erros-comuns')
+                },
+                'passo-a-passo-mvp': {
+                    items: document.querySelectorAll('#passo-a-passo-mvp .checklist-item'),
+                    feedback: document.getElementById('feedback-passo-a-passo-mvp')
+                }
+            };
+
+            const totalItems = allChecklistItems.length;
+
+            /**
+             * Salva o estado do checklist no localStorage.
+             * O estado é um objeto onde as chaves são os data-ids dos itens e os valores são booleanos (true se marcado).
+             */
+            const saveProgress = (id, isChecked) => {
+                let progress = JSON.parse(localStorage.getItem('agileChecklistProgress')) || {};
+                progress[id] = isChecked;
+                localStorage.setItem('agileChecklistProgress', JSON.stringify(progress));
+                updateProgressBar();
+            };
+
+            /**
+             * Restaura o estado do checklist ao carregar a página.
+             * Itera sobre os itens salvos e marca os checkboxes correspondentes.
+             */
+            const loadProgress = () => {
+                const progress = JSON.parse(localStorage.getItem('agileChecklistProgress')) || {};
+                allChecklistItems.forEach(item => {
+                    const id = item.getAttribute('data-id');
+                    const checkbox = item.querySelector('input[type="checkbox"]');
+                    if (progress[id]) {
+                        checkbox.checked = true;
+                        item.classList.add('checked');
+                    }
+                });
+                updateProgressBar();
+            };
+
+            /**
+             * Atualiza a barra de progresso e o texto.
+             * Conta os itens marcados, calcula a porcentagem e atualiza o estilo da barra e o texto.
+             */
+            const updateProgressBar = () => {
+                const checkedItems = document.querySelectorAll('.checklist-item input:checked').length;
+                const percentage = (checkedItems / totalItems) * 100;
+
+                progressBar.style.width = `${percentage}%`;
+                progressText.textContent = `${checkedItems} de ${totalItems} concluídos (${Math.round(percentage)}%)`;
+
+                // Chama a função para checar o feedback de cada seção
+                checkSectionCompletion();
+            };
+
+            /**
+             * Verifica se todos os itens de uma seção foram concluídos e exibe o feedback.
+             */
+            const checkSectionCompletion = () => {
+                for (const key in sections) {
+                    const section = sections[key];
+                    const sectionItemsCount = section.items.length;
+                    const checkedInSection = section.items.length === document.querySelectorAll(`#${key} .checklist-item input:checked`).length;
+                    
+                    if (checkedInSection) {
+                        section.feedback.classList.add('show');
+                    } else {
+                        section.feedback.classList.remove('show');
+                    }
+                }
+            };
+
+            // Adiciona o evento de 'change' a cada checkbox do checklist
+            allChecklistItems.forEach(item => {
+                const checkbox = item.querySelector('input[type="checkbox"]');
+                const id = item.getAttribute('data-id');
+
+                checkbox.addEventListener('change', (event) => {
+                    if (event.target.checked) {
+                        item.classList.add('checked');
+                    } else {
+                        item.classList.remove('checked');
+                    }
+                    saveProgress(id, event.target.checked);
+                });
+            });
+
+            // Restaura o progresso ao carregar a página
+            loadProgress();
+        });
+    </script>
+</body>
+</html>
